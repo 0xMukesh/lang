@@ -1,4 +1,5 @@
 // lowkey x = 45 + (foo * bar)
+// lowkey y = nada
 // [LetToken, IdentifierToken(x), EqualToken, NumberToken(45), PlusToken, OpenParen, IdentifierToken(foo), MultiplyToken, IdentifierToken(bar)]
 
 use crate::utils::{is_alpha, is_num, is_skippable, parse_num_literals, parse_str_literals};
@@ -6,12 +7,13 @@ use crate::utils::{is_alpha, is_num, is_skippable, parse_num_literals, parse_str
 #[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     Let,
+    Null,
 
     Identifier,
     Number,
 
     Equal,
-    BinaryOpr(BinOp),
+    BinaryOpr(BinOpTks),
 
     OpenParen,
     CloseParen,
@@ -21,7 +23,7 @@ pub enum TokenType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum BinOp {
+pub enum BinOpTks {
     Add,
     Subtract,
     Multiply,
@@ -29,7 +31,7 @@ pub enum BinOp {
     Modulo,
 }
 
-impl BinOp {
+impl BinOpTks {
     pub fn from_string(operator: &String) -> Option<Self> {
         match operator.as_str() {
             "+" => Some(Self::Add),
@@ -56,10 +58,16 @@ pub struct Keyword {
 
 impl Keyword {
     pub fn list() -> Vec<Keyword> {
-        vec![Keyword {
-            identifier: String::from("lowkey"),
-            token_type: TokenType::Let,
-        }]
+        vec![
+            Keyword {
+                identifier: String::from("lowkey"),
+                token_type: TokenType::Let,
+            },
+            Keyword {
+                identifier: String::from("nada"),
+                token_type: TokenType::Null,
+            },
+        ]
     }
 
     pub fn is_reserved(str: &String) -> (bool, Option<Keyword>) {
@@ -94,11 +102,11 @@ impl Token {
             let token = match str.as_str() {
                 "(" => Self::new(&mut chars, TokenType::OpenParen),
                 ")" => Self::new(&mut chars, TokenType::CloseParen),
-                "+" => Self::new(&mut chars, TokenType::BinaryOpr(BinOp::Add)),
-                "-" => Self::new(&mut chars, TokenType::BinaryOpr(BinOp::Subtract)),
-                "*" => Self::new(&mut chars, TokenType::BinaryOpr(BinOp::Multiply)),
-                "/" => Self::new(&mut chars, TokenType::BinaryOpr(BinOp::Divide)),
-                "%" => Self::new(&mut chars, TokenType::BinaryOpr(BinOp::Modulo)),
+                "+" => Self::new(&mut chars, TokenType::BinaryOpr(BinOpTks::Add)),
+                "-" => Self::new(&mut chars, TokenType::BinaryOpr(BinOpTks::Subtract)),
+                "*" => Self::new(&mut chars, TokenType::BinaryOpr(BinOpTks::Multiply)),
+                "/" => Self::new(&mut chars, TokenType::BinaryOpr(BinOpTks::Divide)),
+                "%" => Self::new(&mut chars, TokenType::BinaryOpr(BinOpTks::Modulo)),
                 "=" => Self::new(&mut chars, TokenType::Equal),
                 _ => {
                     let is_alpha = is_alpha(&str);

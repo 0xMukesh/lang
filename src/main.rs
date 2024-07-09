@@ -1,11 +1,17 @@
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    process::exit,
+};
 
 mod ast;
+mod interpreter;
 mod lexer;
 mod parser;
 mod utils;
 
 use parser::Parser;
+
+use crate::interpreter::{Interpreter, RuntimeValues};
 
 fn main() {
     loop {
@@ -24,7 +30,18 @@ fn main() {
         }
 
         let output = Parser::parse(&input.to_string());
-        println!("{:?}", output);
+
+        for expr in output.body {
+            let eval = Interpreter::evaluate(expr);
+
+            if let RuntimeValues::Error(err) = eval {
+                eprintln!("{}", err);
+                exit(1);
+            } else {
+                println!("{:?}", eval)
+            }
+        }
+
         continue;
     }
 }

@@ -36,7 +36,7 @@ impl Parser {
         while tokens[0].value.as_str() == "+" || tokens[0].value.as_str() == "-" {
             let operator = &tokens.remove(0);
             let right = Parser::parse_multiplicative_expr(tokens);
-            let operator = BinOp::from_string(&operator.value);
+            let operator = BinOpTks::from_string(&operator.value);
 
             match operator {
                 Some(value) => left = Expr::Binary(Box::new(left), value, Box::new(right)),
@@ -56,7 +56,7 @@ impl Parser {
         {
             let operator = &tokens.remove(0);
             let right = Parser::parse_primary_expr(tokens);
-            let operator = BinOp::from_string(&operator.value);
+            let operator = BinOpTks::from_string(&operator.value);
 
             match operator {
                 Some(value) => left = Expr::Binary(Box::new(left), value, Box::new(right)),
@@ -73,6 +73,7 @@ impl Parser {
         let expr = match token.token_type {
             TokenType::Identifier => Expr::Identifier(token.value.clone()),
             TokenType::Number => Expr::Number(token.value.parse::<i64>().unwrap()),
+            TokenType::Null => Expr::Null,
             TokenType::OpenParen => {
                 let value = Parser::parse_additive_expr(tokens);
                 let prev = tokens.remove(0);

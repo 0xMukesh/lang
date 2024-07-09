@@ -1,10 +1,11 @@
-use crate::lexer::BinOp;
+use crate::lexer::BinOpTks;
 
 #[derive(Debug, PartialEq)]
 pub enum Expr {
     Number(i64),
     Identifier(String),
-    Binary(Box<Expr>, BinOp, Box<Expr>),
+    Binary(Box<Expr>, BinOpTks, Box<Expr>),
+    Null,
     Invalid,
 }
 
